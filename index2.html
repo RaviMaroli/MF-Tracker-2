@@ -1,0 +1,30 @@
+fundInput.oninput = () => {
+  const q = fundInput.value.trim();
+  fundDropdown.innerHTML = "";
+  if (!q) return fundDropdown.style.display = "none";
+
+  // Search API call
+  fetch(`https://api.mfapi.in/mf/search?q=${encodeURIComponent(q)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!Array.isArray(data) || data.length === 0) {
+        fundDropdown.style.display = "none";
+        return;
+      }
+      data.slice(0, 10).forEach(f => {
+        let d = document.createElement("div");
+        d.textContent = f.schemeName;
+        d.onclick = () => {
+          addFund(f);
+          fundInput.value = "";
+          fundDropdown.style.display = "none";
+        };
+        fundDropdown.appendChild(d);
+      });
+      fundDropdown.style.display = "block";
+    })
+    .catch(err => {
+      console.error("Search failed", err);
+      fundDropdown.style.display = "none";
+    });
+};
